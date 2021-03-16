@@ -67,6 +67,14 @@ func NewCard(rank Rank, suit Suit) *Card {
 	}
 }
 
+func (c *Card) Rank() Rank {
+	return c.rank
+}
+
+func (c *Card) Suit() Suit {
+	return c.suit
+}
+
 func (c *Card) String() string {
 	s := ""
 	switch c.rank {
