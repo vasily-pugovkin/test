@@ -1,6 +1,7 @@
 package tienlen_bot
 
 import (
+	"errors"
 	"sort"
 )
 
@@ -43,6 +44,76 @@ func containsRank(cards []*Card, rank Rank) bool {
 		}
 	}
 	return false
+}
+
+func ParseCombination(cards []*Card, kind CombinationKind) (Combination, error) {
+	cards = sortCard(cards)
+	switch kind {
+	case CombinationSingle:
+		if len(cards) != 1 {
+			return nil, errors.New("invalid single card")
+		}
+		return NewSingleCard(cards[0]), nil
+	case CombinationDubs:
+		if len(cards) != 2 || !isDubs(cards[0], cards[1]) {
+			return nil, errors.New("invalid dubs")
+		}
+		return NewDubs(cards[0], cards[1]), nil
+	case CombinationTrips:
+		if len(cards) != 3 || !isTrips(cards[0], cards[1], cards[2]) {
+			return nil, errors.New("invalid trips")
+		}
+		return NewTrips(cards[0], cards[1], cards[2]), nil
+	case CombinationQuads:
+		if len(cards) != 4 || !isQuads(cards[0], cards[1], cards[2], cards[3]) {
+			return nil, errors.New("invalid quads")
+		}
+		return NewQuads(cards[0], cards[1], cards[2], cards[3]), nil
+	case CombinationSequence:
+		if !isSequence(cards) {
+			return nil, errors.New("invalid sequence")
+		}
+		return NewSequence(cards), nil
+	case CombinationTwoConsecutivePairs:
+		if len(cards) != 4 || !isDubs(cards[0], cards[1]) || !isDubs(cards[2], cards[3]) {
+			return nil, errors.New("invalid two consecutive pairs")
+		}
+		dubs1 := NewDubs(cards[0], cards[1])
+		dubs2 := NewDubs(cards[2], cards[3])
+		if !isTwoConsecutivePairs(dubs1, dubs2) {
+			return nil, errors.New("invalid two consecutive pairs")
+		}
+		return NewTwoConsecutivePairs(dubs1, dubs2), nil
+	case CombinationThreeConsecutivePairs:
+		if len(cards) != 6 || !isDubs(cards[0], cards[1]) || !isDubs(cards[2], cards[3]) ||
+			!isDubs(cards[4], cards[5]) {
+			return nil, errors.New("invalid three consecutive pairs")
+		}
+		dubs1 := NewDubs(cards[0], cards[1])
+		dubs2 := NewDubs(cards[2], cards[3])
+		dubs3 := NewDubs(cards[4], cards[5])
+		if !isThreeConsecutivePairs(dubs1, dubs2, dubs3) {
+			return nil, errors.New("invalid three consecutive pairs")
+		}
+		return NewThreeConsecutivePairs(dubs1, dubs2, dubs3), nil
+	case CombinationFourConsecutivePairs:
+		if len(cards) != 8 || !isDubs(cards[0], cards[1]) || !isDubs(cards[2], cards[3]) ||
+			!isDubs(cards[4], cards[5]) || !isDubs(cards[6], cards[7]) {
+			return nil, errors.New("invalid four consecutive pairs")
+		}
+		dubs1 := NewDubs(cards[0], cards[1])
+		dubs2 := NewDubs(cards[2], cards[3])
+		dubs3 := NewDubs(cards[4], cards[5])
+		dubs4 := NewDubs(cards[6], cards[7])
+		if !isFourConsecutivePairs(dubs1, dubs2, dubs3, dubs4) {
+			return nil, errors.New("invalid four consecutive pairs")
+		}
+		return NewFourConsecutivePairs(dubs1, dubs2, dubs3, dubs4), nil
+	case CombinationPass:
+		return NewPass(), nil
+	default:
+		return nil, errors.New("invalid combination kind")
+	}
 }
 
 func GetDubs(cards []*Card) []*Dubs {
