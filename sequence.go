@@ -21,12 +21,12 @@ func NewSequence(cards []*Card) *Sequence {
 	}
 }
 
-func (s *Sequence) kind() CombinationKind {
+func (s *Sequence) Kind() CombinationKind {
 	return CombinationSequence
 }
 
-func (s *Sequence) equals(combination Combination) bool {
-	if combination.kind() != CombinationSequence {
+func (s *Sequence) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationSequence {
 		return false
 	}
 	sequence := combination.(*Sequence)
@@ -41,12 +41,12 @@ func (s *Sequence) equals(combination Combination) bool {
 	return true
 }
 
-func (s *Sequence) cards() []*Card {
+func (s *Sequence) Cards() []*Card {
 	return s.cardList
 }
 
-func (s *Sequence) defeats(combination Combination) bool {
-	if combination.kind() != CombinationSequence{
+func (s *Sequence) Defeats(combination Combination) bool {
+	if combination.Kind() != CombinationSequence{
 		return false
 	}
 	sequence := combination.(*Sequence)
@@ -68,7 +68,7 @@ func (s *Sequence) defeats(combination Combination) bool {
 	return true
 }
 
-func (s *Sequence) copy() Combination {
+func (s *Sequence) Copy() Combination {
 	return NewSequence(s.cardList)
 }
 

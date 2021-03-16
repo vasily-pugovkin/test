@@ -89,7 +89,7 @@ func (l *LocalGame) Move(combination Combination) {
 	if l.isFirstTurn {
 		l.isFirstTurn = false
 	}
-	if combination.kind() == CombinationPass {
+	if combination.Kind() == CombinationPass {
 		if l.currentPlayerIndex == l.previousPlayerIndex {
 			panic("current player can not pass (must move)")
 		}
@@ -161,7 +161,7 @@ func (l *LocalGame) AllAvailableCombinations() []Combination {
 			card := player.GetSmallestCard()
 			availableCards := []Combination{}
 			for i := 0; i < len(list); i++ {
-				if containsCard(list[i].cards(), card) {
+				if containsCard(list[i].Cards(), card) {
 					availableCards = append(availableCards, list[i])
 				}
 			}
@@ -184,7 +184,7 @@ func (l *LocalGame) PlayRandomUntilEnd() {
 		}
 		list := l.AllAvailableCombinations();
 		if len(list) > 0 &&
-			len(list[len(list)-1].cards()) == l.GetCurrentPlayer().GetCardsLength() {
+			len(list[len(list)-1].Cards()) == l.GetCurrentPlayer().GetCardsLength() {
 			l.Move(list[len(list) - 1])
 			break
 		}

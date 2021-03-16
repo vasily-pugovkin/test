@@ -23,23 +23,23 @@ func NewQuads(card1, card2, card3, card4 *Card) *Quads {
 	}
 }
 
-func (q *Quads) kind() CombinationKind {
+func (q *Quads) Kind() CombinationKind {
 	return CombinationQuads
 }
 
-func (q *Quads) equals(combination Combination) bool {
-	if combination.kind() != CombinationQuads {
+func (q *Quads) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationQuads {
 		return false
 	}
 	return q.rank == combination.(*Quads).rank
 }
 
-func (q *Quads) cards() []*Card {
+func (q *Quads) Cards() []*Card {
 	return []*Card{q.card1, q.card2, q.card3, q.card4}
 }
 
-func (q *Quads) defeats(combination Combination) bool {
-	switch combination.kind() {
+func (q *Quads) Defeats(combination Combination) bool {
+	switch combination.Kind() {
 	case CombinationQuads:
 		return q.rank > combination.(*Quads).rank
 	case CombinationThreeConsecutivePairs:
@@ -52,7 +52,7 @@ func (q *Quads) defeats(combination Combination) bool {
 	return false
 }
 
-func (q *Quads) copy() Combination {
+func (q *Quads) Copy() Combination {
 	return NewQuads(q.card1, q.card2, q.card3, q.card4)
 }
 

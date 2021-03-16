@@ -54,7 +54,7 @@ func (l *LocalPlayer) AllAvailableCombinations() []Combination {
 func (l *LocalPlayer) AllAvailableCombinationsDefeat(combination Combination) []Combination {
 	combinations := []Combination{}
 	for i := 0; i < len(l.combinations); i++ {
-		if l.combinations[i].defeats(combination) {
+		if l.combinations[i].Defeats(combination) {
 			combinations = append(combinations, l.combinations[i])
 		}
 	}
@@ -67,7 +67,7 @@ func (l *LocalPlayer) Remove(combination Combination) {
 		panic("invalid input")
 	}
 	l.removeCombination(combination)
-	l.cardsLength -= len(combination.cards())
+	l.cardsLength -= len(combination.Cards())
 	if l.cardsLength < 0 {
 		panic("length of card can not be less than zero")
 	}
@@ -102,7 +102,7 @@ func (l *LocalPlayer) SetIndex(index int) {
 
 func (l *LocalPlayer) Validate() {
 	if l.cards == nil {
-		panic("invalid cards")
+		panic("invalid Cards")
 	}
 	for _, card := range l.cards {
 		l.combinations = append(l.combinations, NewSingleCard(card))
@@ -139,7 +139,7 @@ func (l *LocalPlayer) Validate() {
 		combination := l.combinations[i]
 		connector := []Combination{}
 		for j := 0; j < len(l.combinations); j++ {
-			if i != j && hasAtLeastSameOneCard(combination.cards(), l.combinations[j].cards()) {
+			if i != j && hasAtLeastSameOneCard(combination.Cards(), l.combinations[j].Cards()) {
 				connector = append(connector, l.combinations[j])
 			}
 		}
@@ -148,7 +148,7 @@ func (l *LocalPlayer) Validate() {
 	}
 	l.score = -l.score
 	sort.Slice(l.combinations, func(i, j int) bool {
-		return len(l.combinations[i].cards()) < len(l.combinations[j].cards())
+		return len(l.combinations[i].Cards()) < len(l.combinations[j].Cards())
 	})
 }
 
@@ -180,7 +180,7 @@ func (l *LocalPlayer) GetCardsLength() int {
 
 func (l *LocalPlayer) removeCombination(combination Combination) int {
 	for i := 0; i < len(l.combinations); i++ {
-		if l.combinations[i].equals(combination) {
+		if l.combinations[i].Equals(combination) {
 			l.combinations[i] = l.combinations[len(l.combinations) - 1]
 			l.combinations = l.combinations[:len(l.combinations) - 1]
 			return i
@@ -213,7 +213,7 @@ func (l *LocalPlayer) GetAllCombinationsHasSameAtLeastOneCardWith(combination Co
 }
 
 func (l *LocalPlayer) computeScore(combination Combination) {
-	switch combination.kind() {
+	switch combination.Kind() {
 	case CombinationSingle:
 		c := combination.(*SingleCard)
 		if c.card.rank == Two {

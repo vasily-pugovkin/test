@@ -7,23 +7,23 @@ func NewPass() *Pass {
 	return &Pass{}
 }
 
-func (p *Pass) kind() CombinationKind {
+func (p *Pass) Kind() CombinationKind {
 	return CombinationPass
 }
 
-func (p *Pass) equals(combination Combination) bool {
-	return combination.kind() == CombinationPass
+func (p *Pass) Equals(combination Combination) bool {
+	return combination.Kind() == CombinationPass
 }
 
-func (p *Pass) cards() []*Card {
+func (p *Pass) Cards() []*Card {
 	return []*Card{}
 }
 
-func (p *Pass) defeats(combination Combination) bool {
+func (p *Pass) Defeats(combination Combination) bool {
 	return false
 }
 
-func (p *Pass) copy() Combination {
+func (p *Pass) Copy() Combination {
 	return p
 }
 

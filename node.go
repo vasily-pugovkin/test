@@ -53,7 +53,7 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 	}
 	list := game.AllAvailableCombinations()
 	if !game.IsEnd() {
-		if len(list) > 0 && len(list[len(list)-1].cards()) == game.GetCurrentPlayer().GetCardsLength() {
+		if len(list) > 0 && len(list[len(list)-1].Cards()) == game.GetCurrentPlayer().GetCardsLength() {
 			node.unexploredCombinations = append(node.unexploredCombinations, list[len(list)-1])
 		} else {
 			for i := range list {
@@ -200,9 +200,9 @@ func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 	player := game.GetCurrentPlayer()
 	removedList := []Combination{}
 	for i := range l.unexploredCombinations {
-		if (l.unexploredCombinations[i].kind() == CombinationThreeConsecutivePairs && player.GetCardsLength() > 7) ||
-			(l.unexploredCombinations[i].kind() == CombinationFourConsecutivePairs && player.GetCardsLength() > 9) ||
-			l.unexploredCombinations[i].kind() == CombinationQuads || containsRank(l.unexploredCombinations[i].cards(), Two) {
+		if (l.unexploredCombinations[i].Kind() == CombinationThreeConsecutivePairs && player.GetCardsLength() > 7) ||
+			(l.unexploredCombinations[i].Kind() == CombinationFourConsecutivePairs && player.GetCardsLength() > 9) ||
+			l.unexploredCombinations[i].Kind() == CombinationQuads || containsRank(l.unexploredCombinations[i].Cards(), Two) {
 			removedList = append(removedList, l.unexploredCombinations[i])
 		}
 	}
@@ -223,18 +223,18 @@ func (l *LocalNode) removeStrongCombinationsThan2IfHave2() {
 	contains2sCard := false
 	for i := range l.unexploredCombinations {
 		o := l.unexploredCombinations[i]
-		if !contains2sCard && o.kind() == CombinationSingle {
+		if !contains2sCard && o.Kind() == CombinationSingle {
 			if o.(*SingleCard).card.rank == Two {
 				contains2sCard = true
 			}
 		}
-		if o.kind() == CombinationQuads ||
-			o.kind() == CombinationFourConsecutivePairs ||
-			o.kind() == CombinationThreeConsecutivePairs {
+		if o.Kind() == CombinationQuads ||
+			o.Kind() == CombinationFourConsecutivePairs ||
+			o.Kind() == CombinationThreeConsecutivePairs {
 			removedList1 = append(removedList1, o)
 		}
 
-		if containsRank(o.cards(), Two) && o.kind() != CombinationSingle {
+		if containsRank(o.Cards(), Two) && o.Kind() != CombinationSingle {
 			removedList2 = append(removedList2, o)
 		}
 	}
@@ -259,25 +259,25 @@ func (l *LocalNode) keepConsecutivePairsForDefeating2(game Game) {
 	if game.HasNoLastDealtCombination() {
 		return
 	}
-	if !containsRank(game.GetLastDealtCombination().cards(), Two) {
+	if !containsRank(game.GetLastDealtCombination().Cards(), Two) {
 		return
 	}
 	// nếu bot đánh đôi 2, hoặc tam 2 mà chặn được thì chặn luôn
-	if len(game.GetLastDealtCombination().cards()) >= 2 &&
+	if len(game.GetLastDealtCombination().Cards()) >= 2 &&
 		len(l.unexploredCombinations) >= 2 {
 		l.removePass()
 		return
 	}
 
 	//nếu bot đánh 1 con 2 lẻ
-	if game.GetLastDealtCombination().kind() == CombinationSingle {
+	if game.GetLastDealtCombination().Kind() == CombinationSingle {
 		if !l.hasStrongCombination(l.unexploredCombinations) {
 			return
 		}
 		combinations := game.GetPlayerAt(game.GetPreviousPlayerIndex()).AllAvailableCombinations()
 		contains2 := false
 		for i := range combinations {
-			if combinations[i].kind() == CombinationSingle &&
+			if combinations[i].Kind() == CombinationSingle &&
 				combinations[i].(*SingleCard).card.rank == Two {
 				contains2 = true
 				break
@@ -291,7 +291,7 @@ func (l *LocalNode) keepConsecutivePairsForDefeating2(game Game) {
 		}
 
 		// nếu người chơi trước có 2 thì 100% chặn nếu con vừa đánh là 2 đỏ và 90% chặn nếu là 2 đen
-		card := game.GetLastDealtCombination().cards()[0]
+		card := game.GetLastDealtCombination().Cards()[0]
 		if card.suit == Heart || card.suit == Diamond {
 			l.removePass()
 		} else {
@@ -321,7 +321,7 @@ func (l *LocalNode) remove2IfIsFirstTurn(game Game) {
 	}
 	removedList := []Combination{}
 	for i := range l.unexploredCombinations {
-		if containsRank(l.unexploredCombinations[i].cards(), Two) {
+		if containsRank(l.unexploredCombinations[i].Cards(), Two) {
 			removedList = append(removedList, l.unexploredCombinations[i])
 		}
 	}
@@ -334,13 +334,13 @@ func (l *LocalNode) remove2IfIsFirstTurn(game Game) {
 // bắt buộc chặn con lẻ nếu có thể
 func (l *LocalNode) canDefeatTheirSingleCard(game Game) bool {
 	list := game.GetCurrentPlayer().AllAvailableCombinations()
-	if !game.HasNoLastDealtCombination() && game.GetLastDealtCombination().kind() == CombinationSingle {
+	if !game.HasNoLastDealtCombination() && game.GetLastDealtCombination().Kind() == CombinationSingle {
 		Loop: for i := range l.unexploredCombinations {
-			if l.unexploredCombinations[i].kind() != CombinationSingle {
+			if l.unexploredCombinations[i].Kind() != CombinationSingle {
 				continue
 			}
 			for j := range list {
-				if list[j].kind() != CombinationSingle && containsCard(list[j].cards(), l.unexploredCombinations[i].(*SingleCard).card) {
+				if list[j].Kind() != CombinationSingle && containsCard(list[j].Cards(), l.unexploredCombinations[i].(*SingleCard).card) {
 					continue Loop
 				}
 			}
@@ -353,7 +353,7 @@ func (l *LocalNode) canDefeatTheirSingleCard(game Game) bool {
 // xóa pass tức là bắt buộc đánh
 func (l *LocalNode) removePass() {
 	for i := 0; i < len(l.unexploredCombinations); i++ {
-		if l.unexploredCombinations[i].kind() == CombinationPass {
+		if l.unexploredCombinations[i].Kind() == CombinationPass {
 			l.removeUnexploredCombination(l.unexploredCombinations[i])
 			break
 		}
@@ -363,7 +363,7 @@ func (l *LocalNode) removePass() {
 // xóa bộ khỏi list
 func (l *LocalNode) removeUnexploredCombination(combination Combination) {
 	for i := range l.unexploredCombinations {
-		if l.unexploredCombinations[i].equals(combination) {
+		if l.unexploredCombinations[i].Equals(combination) {
 			l.unexploredCombinations = append(l.unexploredCombinations[:i], l.unexploredCombinations[i+1:]...)
 			return
 		}
@@ -379,8 +379,8 @@ func (l *LocalNode) removeUnexploredCombinationAt(index int) Combination {
 // có tứ quý, 3 đôi thông, 4 đôi thông
 func (l *LocalNode) hasStrongCombination(combinations []Combination) bool {
 	for i := range combinations {
-		if combinations[i].kind() == CombinationQuads || combinations[i].kind() == CombinationThreeConsecutivePairs ||
-			combinations[i].kind() == CombinationFourConsecutivePairs {
+		if combinations[i].Kind() == CombinationQuads || combinations[i].Kind() == CombinationThreeConsecutivePairs ||
+			combinations[i].Kind() == CombinationFourConsecutivePairs {
 			return true
 		}
 	}
@@ -393,14 +393,14 @@ func (l *LocalNode) getAlmostSmallestSingleCardWhichNotInAnyCombination() *Card 
 	count := 0
 Loop:
 	for i := range l.unexploredCombinations {
-		if l.unexploredCombinations[i].kind() != CombinationSingle {
+		if l.unexploredCombinations[i].Kind() != CombinationSingle {
 			continue
 		}
 		for j := range l.unexploredCombinations {
-			if l.unexploredCombinations[j].kind() == CombinationSingle {
+			if l.unexploredCombinations[j].Kind() == CombinationSingle {
 				continue
 			}
-			if containsCard(l.unexploredCombinations[j].cards(), l.unexploredCombinations[i].(*SingleCard).card) {
+			if containsCard(l.unexploredCombinations[j].Cards(), l.unexploredCombinations[i].(*SingleCard).card) {
 				continue Loop
 			}
 		}

@@ -20,11 +20,11 @@ const (
 )
 
 type Combination interface {
-	kind() CombinationKind
-	equals(combination Combination) bool
-	cards() []*Card
-	defeats(combination Combination) bool
-	copy() Combination
+	Kind() CombinationKind
+	Equals(combination Combination) bool
+	Cards() []*Card
+	Defeats(combination Combination) bool
+	Copy() Combination
 	String() string
 }
 
@@ -112,7 +112,7 @@ func ParseCombination(cards []*Card, kind CombinationKind) (Combination, error) 
 	case CombinationPass:
 		return NewPass(), nil
 	default:
-		return nil, errors.New("invalid combination kind")
+		return nil, errors.New("invalid combination Kind")
 	}
 }
 

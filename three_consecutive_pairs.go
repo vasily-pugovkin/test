@@ -23,19 +23,19 @@ func NewThreeConsecutivePairs(dubs1, dubs2, dubs3 *Dubs) *ThreeConsecutivePairs 
 	}
 }
 
-func (t *ThreeConsecutivePairs) kind() CombinationKind {
+func (t *ThreeConsecutivePairs) Kind() CombinationKind {
 	return CombinationThreeConsecutivePairs
 }
 
-func (t *ThreeConsecutivePairs) equals(combination Combination) bool {
-	if combination.kind() != CombinationThreeConsecutivePairs {
+func (t *ThreeConsecutivePairs) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationThreeConsecutivePairs {
 		return false
 	}
 	o := combination.(*ThreeConsecutivePairs)
-	return t.dubs1.equals(o.dubs1) && t.dubs2.equals(o.dubs2) && t.dubs3.equals(o.dubs3)
+	return t.dubs1.Equals(o.dubs1) && t.dubs2.Equals(o.dubs2) && t.dubs3.Equals(o.dubs3)
 }
 
-func (t *ThreeConsecutivePairs) cards() []*Card {
+func (t *ThreeConsecutivePairs) Cards() []*Card {
 	return []*Card {
 		t.dubs1.card1, t.dubs1.card2,
 		t.dubs2.card1, t.dubs2.card2,
@@ -43,8 +43,8 @@ func (t *ThreeConsecutivePairs) cards() []*Card {
 	}
 }
 
-func (t *ThreeConsecutivePairs) defeats(combination Combination) bool {
-	if combination.kind() != CombinationThreeConsecutivePairs{
+func (t *ThreeConsecutivePairs) Defeats(combination Combination) bool {
+	if combination.Kind() != CombinationThreeConsecutivePairs{
 		return false
 	}
 	o := combination.(*ThreeConsecutivePairs)
@@ -54,10 +54,10 @@ func (t *ThreeConsecutivePairs) defeats(combination Combination) bool {
 	return t.minRank < o.minRank
 }
 
-func (t *ThreeConsecutivePairs) copy() Combination {
-	return NewThreeConsecutivePairs(t.dubs1.copy().(*Dubs),
-		t.dubs2.copy().(*Dubs),
-		t.dubs3.copy().(*Dubs))
+func (t *ThreeConsecutivePairs) Copy() Combination {
+	return NewThreeConsecutivePairs(t.dubs1.Copy().(*Dubs),
+		t.dubs2.Copy().(*Dubs),
+		t.dubs3.Copy().(*Dubs))
 }
 
 func (t *ThreeConsecutivePairs) String() string {

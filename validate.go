@@ -149,7 +149,7 @@ func compareTwoConsecutivePairs(c1, c2 *TwoConsecutivePairs) int {
 	if c1.minRank != c2.minRank {
 		return compareRank(c1.minRank, c2.minRank)
 	}
-	if c1.dubs2.equals(c2.dubs2) {
+	if c1.dubs2.Equals(c2.dubs2) {
 		return compareDubs(c1.dubs1, c2.dubs1)
 	}
 	return compareDubs(c1.dubs2, c2.dubs2)

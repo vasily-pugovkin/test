@@ -25,22 +25,22 @@ func NewFourConsecutivePairs(dubs1, dubs2, dubs3, dubs4 *Dubs) *FourConsecutiveP
 	}
 }
 
-func (f *FourConsecutivePairs) kind() CombinationKind {
+func (f *FourConsecutivePairs) Kind() CombinationKind {
 	return CombinationFourConsecutivePairs
 }
 
-func (f *FourConsecutivePairs) equals(combination Combination) bool {
-	if combination.kind() != CombinationFourConsecutivePairs {
+func (f *FourConsecutivePairs) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationFourConsecutivePairs {
 		return false
 	}
 	o := combination.(*FourConsecutivePairs)
-	return f.dubs1.equals(o.dubs1) &&
-		f.dubs2.equals(o.dubs2) &&
-		f.dubs3.equals(o.dubs3) &&
-		f.dubs4.equals(o.dubs4)
+	return f.dubs1.Equals(o.dubs1) &&
+		f.dubs2.Equals(o.dubs2) &&
+		f.dubs3.Equals(o.dubs3) &&
+		f.dubs4.Equals(o.dubs4)
 }
 
-func (f *FourConsecutivePairs) cards() []*Card {
+func (f *FourConsecutivePairs) Cards() []*Card {
 	return []*Card{
 		f.dubs1.card1, f.dubs1.card2,
 		f.dubs2.card1, f.dubs2.card2,
@@ -49,8 +49,8 @@ func (f *FourConsecutivePairs) cards() []*Card {
 	}
 }
 
-func (f *FourConsecutivePairs) defeats(combination Combination) bool {
-	switch combination.kind() {
+func (f *FourConsecutivePairs) Defeats(combination Combination) bool {
+	switch combination.Kind() {
 	case CombinationFourConsecutivePairs:
 		o := combination.(*FourConsecutivePairs)
 		if f.minRank == o.minRank {
@@ -69,9 +69,9 @@ func (f *FourConsecutivePairs) defeats(combination Combination) bool {
 	return false
 }
 
-func (f *FourConsecutivePairs) copy() Combination {
-	return NewFourConsecutivePairs(f.dubs1.copy().(*Dubs), f.dubs2.copy().(*Dubs),
-		f.dubs3.copy().(*Dubs), f.dubs4.copy().(*Dubs))
+func (f *FourConsecutivePairs) Copy() Combination {
+	return NewFourConsecutivePairs(f.dubs1.Copy().(*Dubs), f.dubs2.Copy().(*Dubs),
+		f.dubs3.Copy().(*Dubs), f.dubs4.Copy().(*Dubs))
 }
 
 func (f *FourConsecutivePairs) String() string {

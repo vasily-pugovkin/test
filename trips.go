@@ -21,31 +21,31 @@ func NewTrips(card1, card2, card3 *Card) *Trips {
 	}
 }
 
-func (t *Trips) kind() CombinationKind {
+func (t *Trips) Kind() CombinationKind {
 	return CombinationTrips
 }
 
-func (t *Trips) equals(combination Combination) bool {
-	if combination.kind() != CombinationTrips {
+func (t *Trips) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationTrips {
 		return false
 	}
 	trips := combination.(*Trips)
 	return t.card1.equals(trips.card1) && t.card2.equals(trips.card2) && t.card3.equals(trips.card3)
 }
 
-func (t *Trips) cards() []*Card {
+func (t *Trips) Cards() []*Card {
 	return []*Card{t.card1, t.card2, t.card3}
 }
 
-func (t *Trips) defeats(combination Combination) bool {
-	if combination.kind() != CombinationTrips {
+func (t *Trips) Defeats(combination Combination) bool {
+	if combination.Kind() != CombinationTrips {
 		return false
 	}
 	trips := combination.(*Trips)
 	return t.rank > trips.rank
 }
 
-func (t *Trips) copy() Combination {
+func (t *Trips) Copy() Combination {
 	return NewTrips(t.card1, t.card2, t.card3)
 }
 

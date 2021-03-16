@@ -8,20 +8,20 @@ func NewSingleCard(card *Card) *SingleCard {
 	return &SingleCard{card: card}
 }
 
-func (s *SingleCard) kind() CombinationKind {
+func (s *SingleCard) Kind() CombinationKind {
 	return CombinationSingle
 }
 
-func (s *SingleCard) equals(combination Combination) bool {
-	return combination.kind() == CombinationSingle && combination.(*SingleCard).card.equals(s.card)
+func (s *SingleCard) Equals(combination Combination) bool {
+	return combination.Kind() == CombinationSingle && combination.(*SingleCard).card.equals(s.card)
 }
 
-func (s *SingleCard) cards() []*Card {
+func (s *SingleCard) Cards() []*Card {
 	return []*Card{s.card}
 }
 
-func (s *SingleCard) defeats(combination Combination) bool {
-	if combination.kind() != CombinationSingle {
+func (s *SingleCard) Defeats(combination Combination) bool {
+	if combination.Kind() != CombinationSingle {
 		return false
 	}
 	c := combination.(*SingleCard)
@@ -37,7 +37,7 @@ func (s *SingleCard) defeats(combination Combination) bool {
 	return true
 }
 
-func (s *SingleCard) copy() Combination {
+func (s *SingleCard) Copy() Combination {
 	return NewSingleCard(&Card{
 		rank: s.card.rank,
 		suit: s.card.suit,

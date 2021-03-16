@@ -23,24 +23,24 @@ func NewDubs(card1, card2 *Card) *Dubs {
 	}
 }
 
-func (d *Dubs) kind() CombinationKind {
+func (d *Dubs) Kind() CombinationKind {
 	return CombinationDubs
 }
 
-func (d *Dubs) equals(combination Combination) bool {
-	if combination.kind() != CombinationDubs {
+func (d *Dubs) Equals(combination Combination) bool {
+	if combination.Kind() != CombinationDubs {
 		return false
 	}
 	dub := combination.(*Dubs)
 	return dub.card1.equals(d.card1) && dub.card2.equals(d.card2)
 }
 
-func (d *Dubs) cards() []*Card {
+func (d *Dubs) Cards() []*Card {
 	return []*Card{d.card1, d.card2}
 }
 
-func (d *Dubs) defeats(combination Combination) bool {
-	if combination.kind() != CombinationDubs {
+func (d *Dubs) Defeats(combination Combination) bool {
+	if combination.Kind() != CombinationDubs {
 		return false
 	}
 	dub := combination.(*Dubs)
@@ -56,7 +56,7 @@ func (d *Dubs) defeats(combination Combination) bool {
 	return true
 }
 
-func (d *Dubs) copy() Combination {
+func (d *Dubs) Copy() Combination {
 	return NewDubs(d.card1, d.card2)
 }
 

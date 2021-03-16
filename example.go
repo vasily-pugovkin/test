@@ -24,7 +24,7 @@ func getCards(player Player) []*Card {
 	cards := []*Card{}
 	list := player.AllAvailableCombinations()
 	for i := range list {
-		tmpCards := list[i].cards()
+		tmpCards := list[i].Cards()
 		for j := range tmpCards {
 			if containsCard(cards, tmpCards[j]) {
 				continue

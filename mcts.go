@@ -97,9 +97,9 @@ func getSmallestPairsInPairsList(game Game) Combination {
 	dubsCount := 0
 	dubs := make([]Combination, 2)
 	for i := range list {
-		if list[i].kind() == CombinationSingle {
+		if list[i].Kind() == CombinationSingle {
 			cardCount++
-		} else if list[i].kind() == CombinationDubs {
+		} else if list[i].Kind() == CombinationDubs {
 			if dubsCount >= 2 {
 				return nil
 			}
@@ -117,10 +117,10 @@ func getSmallestPairsInPairsList(game Game) Combination {
 		combinations := game.GetPlayerAt(i).AllAvailableCombinations()
 		count := 0
 		for j := range combinations {
-			if combinations[j].kind() == CombinationSingle {
+			if combinations[j].Kind() == CombinationSingle {
 				count++
 			}
-			if combinations[j].defeats(dubs[1]) {
+			if combinations[j].Defeats(dubs[1]) {
 				return nil
 			}
 		}
@@ -156,7 +156,7 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 
 func isAllSingleCard(combinations []Combination) bool {
 	for _, combination := range combinations {
-		if combination.kind() == CombinationSingle {
+		if combination.Kind() == CombinationSingle {
 			continue
 		}
 		return false
