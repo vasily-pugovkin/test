@@ -6,5 +6,5 @@ import (
 )
 
 func TestGetSequence(t *testing.T) {
-	t.Log(fmt.Sprintf("%+v", GetSequence(sortCard(parseCards("3♣, 3♥,4♥, 5♥, 6♣")))))
+	t.Log(fmt.Sprintf("%+v", GetSequence(SortCard(ParseCards("3♣, 3♥,4♥, 5♥, 6♣")))))
 }

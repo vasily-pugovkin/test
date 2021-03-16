@@ -47,7 +47,7 @@ func containsRank(cards []*Card, rank Rank) bool {
 }
 
 func ParseCombination(cards []*Card, kind CombinationKind) (Combination, error) {
-	cards = sortCard(cards)
+	cards = SortCard(cards)
 	switch kind {
 	case CombinationSingle:
 		if len(cards) != 1 {
