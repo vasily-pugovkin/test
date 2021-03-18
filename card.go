@@ -189,7 +189,7 @@ func parseCard(s string) *Card {
 	return c
 }
 
-func parseCards(s string) []*Card {
+func ParseCards(s string) []*Card {
 	list := strings.Split(strings.ReplaceAll(s, " ", ""), ",")
 	cards := make([]*Card, len(list))
 	for i := 0; i < len(cards); i++ {

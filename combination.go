@@ -300,3 +300,19 @@ func getAllCardsWithRank(cards []*Card, rank Rank) []*Card {
 	}
 	return list
 }
+
+func countCardInCombinationList(combinations []Combination) int {
+	count := 0
+	checker := make([]bool, 52)
+	for _, combination := range combinations {
+		cards := combination.Cards()
+		for _, card := range cards {
+			code := int(card.rank) * 4 + int(card.suit)
+			if !checker[code] {
+				checker[code] = true
+				count++
+			}
+		}
+	}
+	return count
+}

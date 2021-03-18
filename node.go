@@ -56,10 +56,9 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 		if len(list) > 0 && len(list[len(list)-1].Cards()) == game.GetCurrentPlayer().GetCardsLength() {
 			node.unexploredCombinations = append(node.unexploredCombinations, list[len(list)-1])
 		} else {
-			for i := range list {
-				node.unexploredCombinations = append(node.unexploredCombinations, list[i])
-			}
-			if isNil(parent) && game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() {
+			node.unexploredCombinations = make([]Combination, len(list))
+			copy(node.unexploredCombinations, list)
+			if isNil(parent) && game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() && !game.GetConfig().IsFirstTurn {
 				node.removeStrongCombinationsIfNotNecessary(game)
 			} else if game.GetCurrentPlayerIndex() != game.GetPreviousPlayerIndex() {
 				node.unexploredCombinations = append(node.unexploredCombinations, NewPass())
@@ -141,7 +140,7 @@ func (l *LocalNode) GetMostVisitedChildCombination() Combination {
 
 func (l *LocalNode) GetUCT() float64 {
 	exploit := l.reward.GetScoreOfPlayer(l.currentPlayerIndex) / float64(l.visit)
-	discover := l.C * math.Sqrt(math.Log(float64(l.parent.GetVisit())) / float64(l.visit))
+	discover := l.C * math.Sqrt(math.Log(float64(l.parent.GetVisit()))/float64(l.visit))
 	balance := l.K / (l.K + float64(l.visit))
 	return exploit + discover + balance
 }
@@ -192,6 +191,7 @@ func (l *LocalNode) SetKFactor(k float64) {
 //  xóa 3 đôi thông, 4 đôi thông và 2 đi
 func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 	conf := game.GetConfig()
+
 	for i := 0; i < conf.MaxPlayer; i++ {
 		if game.GetPlayerAt(i).GetCardsLength() <= NumberOfCardsAtLateGame {
 			return
@@ -200,16 +200,19 @@ func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 	player := game.GetCurrentPlayer()
 	removedList := []Combination{}
 	for i := range l.unexploredCombinations {
-		if (l.unexploredCombinations[i].Kind() == CombinationThreeConsecutivePairs && player.GetCardsLength() > 7) ||
-			(l.unexploredCombinations[i].Kind() == CombinationFourConsecutivePairs && player.GetCardsLength() > 9) ||
-			l.unexploredCombinations[i].Kind() == CombinationQuads || containsRank(l.unexploredCombinations[i].Cards(), Two) {
+		if (l.unexploredCombinations[i].Kind() == CombinationThreeConsecutivePairs &&
+			player.GetCardsLength() > 7) ||
+			(l.unexploredCombinations[i].Kind() == CombinationFourConsecutivePairs &&
+				player.GetCardsLength() > 9) ||
+			l.unexploredCombinations[i].Kind() == CombinationQuads ||
+			containsRank(l.unexploredCombinations[i].Cards(), Two) {
 			removedList = append(removedList, l.unexploredCombinations[i])
 		}
 	}
 
 	for i := range removedList {
 		l.removeUnexploredCombination(removedList[i])
-		connectors := player.GetAllCombinationsHasSameAtLeastOneCardWith(removedList[i])
+		connectors := game.GetCurrentPlayer().GetAllCombinationsHasSameAtLeastOneCardWith(removedList[i])
 		for j := range connectors {
 			l.removeUnexploredCombination(connectors[j])
 		}
@@ -335,7 +338,8 @@ func (l *LocalNode) remove2IfIsFirstTurn(game Game) {
 func (l *LocalNode) canDefeatTheirSingleCard(game Game) bool {
 	list := game.GetCurrentPlayer().AllAvailableCombinations()
 	if !game.HasNoLastDealtCombination() && game.GetLastDealtCombination().Kind() == CombinationSingle {
-		Loop: for i := range l.unexploredCombinations {
+	Loop:
+		for i := range l.unexploredCombinations {
 			if l.unexploredCombinations[i].Kind() != CombinationSingle {
 				continue
 			}
