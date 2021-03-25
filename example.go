@@ -39,6 +39,7 @@ func StartNewExampleGame() {
 	gameConfig := NewDefaultGameConfig(4)
 	game := createGame(gameConfig)
 	mctsConfig := NewDefaultMctsConfig()
+	mctsConfig.Debug = true
 	reader := bufio.NewReader(os.Stdin)
 
 	for !game.IsEnd() {
