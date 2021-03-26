@@ -71,6 +71,9 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 				if node.canDefeatTheirSingleCard(game) {
 					node.removePass()
 				}
+				if game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() {
+					node.removeSingleCardIfTheyAllHaveOneCardLeft(game)
+				}
 			}
 		}
 	}
@@ -370,6 +373,43 @@ func (l *LocalNode) removePass() {
 			l.removeUnexploredCombination(l.unexploredCombinations[i])
 			break
 		}
+	}
+}
+
+func (l *LocalNode) removeSingleCardIfTheyAllHaveOneCardLeft(game Game) {
+	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
+		if i == game.GetCurrentPlayerIndex() {
+			continue
+		}
+		if game.GetPlayerAt(i).GetCardsLength() == 1 {
+			continue
+		}
+		return
+	}
+
+	backup := make([]Combination, len(l.unexploredCombinations))
+	copy(backup, l.unexploredCombinations)
+
+	removedList := []int{}
+	keep2List := []Combination{}
+	for i := range l.unexploredCombinations {
+		if l.unexploredCombinations[i].Kind() == CombinationSingle {
+			removedList = append(removedList, i)
+			if l.unexploredCombinations[i].Cards()[0].rank == Two {
+				keep2List = append(keep2List, l.unexploredCombinations[i])
+			}
+		}
+	}
+
+	for _, i := range removedList {
+		l.removeUnexploredCombinationAt(i)
+	}
+
+	if len(l.unexploredCombinations) == 0 {
+		l.unexploredCombinations = keep2List
+	}
+	if len(l.unexploredCombinations) == 0 {
+		l.unexploredCombinations = backup
 	}
 }
 
