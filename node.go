@@ -60,6 +60,7 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 			copy(node.unexploredCombinations, list)
 			if isNil(parent) && game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() && !game.GetConfig().IsFirstTurn {
 				node.removeStrongCombinationsIfNotNecessary(game)
+				println(len(node.unexploredCombinations))
 			} else if game.GetCurrentPlayerIndex() != game.GetPreviousPlayerIndex() {
 				node.unexploredCombinations = append(node.unexploredCombinations, NewPass())
 			}
@@ -198,6 +199,9 @@ func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 		}
 	}
 	player := game.GetCurrentPlayer()
+	temp := make([]Combination, len(l.unexploredCombinations))
+	copy(temp, l.unexploredCombinations)
+
 	removedList := []Combination{}
 	for i := range l.unexploredCombinations {
 		if (l.unexploredCombinations[i].Kind() == CombinationThreeConsecutivePairs &&
@@ -216,6 +220,11 @@ func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 		for j := range connectors {
 			l.removeUnexploredCombination(connectors[j])
 		}
+	}
+
+	// nếu vô tình xóa hết con mẹ nó nước đi thì thôi coi như xí xóa
+	if len(l.unexploredCombinations) == 0 {
+		l.unexploredCombinations = temp
 	}
 }
 
