@@ -60,19 +60,21 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 			copy(node.unexploredCombinations, list)
 			if isNil(parent) && game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() && !game.GetConfig().IsFirstTurn {
 				node.removeStrongCombinationsIfNotNecessary(game)
-				println(len(node.unexploredCombinations))
 			} else if game.GetCurrentPlayerIndex() != game.GetPreviousPlayerIndex() {
 				node.unexploredCombinations = append(node.unexploredCombinations, NewPass())
 			}
 			if isNil(parent) {
-				node.removeStrongCombinationsThan2IfHave2()
 				node.keepConsecutivePairsForDefeating2(game)
-				node.remove2IfIsFirstTurn(game)
+				if node.allHasOneCardLeft(game) {
+					if game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() {
+						node.removeSingleCardIfTheyAllHaveOneCardLeft(game)
+					}
+				} else {
+					node.removeStrongCombinationsThan2IfHave2()
+					node.remove2IfIsFirstTurn(game)
+				}
 				if node.canDefeatTheirSingleCard(game) {
 					node.removePass()
-				}
-				if game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() {
-					node.removeSingleCardIfTheyAllHaveOneCardLeft(game)
 				}
 			}
 		}
@@ -401,8 +403,8 @@ func (l *LocalNode) removeSingleCardIfTheyAllHaveOneCardLeft(game Game) {
 		}
 	}
 
-	for _, i := range removedList {
-		l.removeUnexploredCombinationAt(i)
+	for i := len(removedList) - 1; i >=0; i-- {
+		l.removeUnexploredCombinationAt(removedList[i])
 	}
 
 	if len(l.unexploredCombinations) == 0 {
@@ -464,4 +466,18 @@ Loop:
 		}
 	}
 	return card
+}
+
+// true nếu tất cả mọi người chơi khác còn 1 lá
+func (l *LocalNode) allHasOneCardLeft(game Game) bool {
+	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
+		if i == game.GetCurrentPlayerIndex() {
+			continue
+		}
+		if game.GetPlayerAt(i).GetCardsLength() == 1 {
+			continue
+		}
+		return false
+	}
+	return true
 }
