@@ -44,14 +44,18 @@ func (t *ThreeConsecutivePairs) Cards() []*Card {
 }
 
 func (t *ThreeConsecutivePairs) Defeats(combination Combination) bool {
-	if combination.Kind() != CombinationThreeConsecutivePairs{
-		return false
+	if combination.Kind() == CombinationThreeConsecutivePairs{
+		o := combination.(*ThreeConsecutivePairs)
+		if t.minRank == o.minRank {
+			return t.maxSuit > o.maxSuit
+		}
+		return t.minRank > o.minRank
 	}
-	o := combination.(*ThreeConsecutivePairs)
-	if t.minRank == o.minRank {
-		return t.maxSuit > o.maxSuit
+	if combination.Kind() == CombinationSingle {
+		o := combination.(*SingleCard)
+		return o.card.rank == Two
 	}
-	return t.minRank < o.minRank
+	return false
 }
 
 func (t *ThreeConsecutivePairs) Copy() Combination {
