@@ -73,6 +73,7 @@ func SelectBestCombination(game Game, config *MctsConfig) Combination {
 	if config.Debug {
 		println(fmt.Sprintf("MCTS %d interactions, reward: %+v, visit: %d, thinking time: %d",
 			config.Interactions - interactions, root.GetReward(), root.GetVisit(), currentTimeMillis() - startThinkingTime))
+		root.PrintAllChildren()
 	}
 
 	return root.GetMostVisitedChildCombination()

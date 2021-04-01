@@ -132,7 +132,7 @@ func (c *Card) equals(card *Card) bool {
 	return c.rank == card.rank && c.suit == card.suit
 }
 
-func parseCard(s string) *Card {
+func ParseCard(s string) *Card {
 	c := &Card{}
 	var rank, suit string
 	if s[:2] == "10" {
@@ -193,7 +193,7 @@ func ParseCards(s string) []*Card {
 	list := strings.Split(strings.ReplaceAll(s, " ", ""), ",")
 	cards := make([]*Card, len(list))
 	for i := 0; i < len(cards); i++ {
-		cards[i] = parseCard(list[i])
+		cards[i] = ParseCard(list[i])
 	}
 	return cards
 }

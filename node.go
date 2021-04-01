@@ -21,6 +21,7 @@ type Node interface {
 	GetCFactor() float64
 	GetReward() Reward
 	SetKFactor(k float64)
+	String() string
 }
 
 type LocalNode struct {
@@ -64,14 +65,22 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 				node.unexploredCombinations = append(node.unexploredCombinations, NewPass())
 			}
 			if isNil(parent) {
-				node.keepConsecutivePairsForDefeating2(game)
+				if !game.HasNoLastDealtCombination() {
+					node.keepConsecutivePairsForDefeating2(game)
+				}
 				if node.allHasOneCardLeft(game) {
 					if game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() {
 						node.removeSingleCardIfTheyAllHaveOneCardLeft(game)
 					}
 				} else {
-					node.removeStrongCombinationsThan2IfHave2()
-					node.remove2IfIsFirstTurn(game)
+					if game.HasNoLastDealtCombination() {
+						// chỉ ưu tiên đánh 2 hơn thông và tứ quý nếu không phải turn chặn
+						node.removeStrongCombinationsThan2IfHave2()
+						// xóa 2 nếu là lượt đánh không chặt
+						// và chỉ còn 1 con 2 với có ít nhất 1 con lẻ nhỏ hơn 2
+						// và không ai còn 1 lá trên bàn
+						node.remove2IfIsFirstTurn(game)
+					}
 				}
 				if node.canDefeatTheirSingleCard(game) {
 					node.removePass()
@@ -168,11 +177,11 @@ func (l *LocalNode) PrintAsTree(space string) {
 func (l *LocalNode) PrintAllChildren() {
 	s := ""
 	for _, node := range l.children {
-		s += fmt.Sprintf("Node:   %-40s", node.GetCombination())
+		s += fmt.Sprintf("%-40s", "Node:   " + node.GetCombination().String())
 		s += "|"
-		s += fmt.Sprintf("Visit:  %-20d", node.GetVisit())
+		s += fmt.Sprintf("%-20s", fmt.Sprintf("Visit:  %d", node.GetVisit()))
 		s += "|"
-		s += fmt.Sprintf("Reward: %-30s", node.GetReward())
+		s += fmt.Sprintf("%-30s", fmt.Sprintf("Reward: %+v", node.GetReward()))
 		s += "\n"
 	}
 	println(s)
@@ -273,9 +282,7 @@ func (l *LocalNode) removeStrongCombinationsThan2IfHave2() {
 
 // luôn dùng tứ quý, 3 đôi thông hoặc 4 đôi thông nếu người trước đánh 2
 func (l *LocalNode) keepConsecutivePairsForDefeating2(game Game) {
-	if game.HasNoLastDealtCombination() {
-		return
-	}
+	// nếu con đánh ko phải 2 hoặc đôi 2 hoặc tam 2 thì thôi
 	if !containsRank(game.GetLastDealtCombination().Cards(), Two) {
 		return
 	}
@@ -290,7 +297,11 @@ func (l *LocalNode) keepConsecutivePairsForDefeating2(game Game) {
 	if game.GetLastDealtCombination().Kind() == CombinationSingle {
 		if !l.hasStrongCombination(l.unexploredCombinations) {
 			return
+		} else if game.GetMaxPlayerNumber() == 1 || rand.Intn(100) < 70 {
+			// 70% remove 2 if not chặt turn
+			l.removeAllSingleCard()
 		}
+
 		combinations := game.GetPlayerAt(game.GetPreviousPlayerIndex()).AllAvailableCombinations()
 		contains2 := false
 		for i := range combinations {
@@ -321,9 +332,7 @@ func (l *LocalNode) keepConsecutivePairsForDefeating2(game Game) {
 
 // loại con 2 ra nếu turn này mình không phải chặn ai
 func (l *LocalNode) remove2IfIsFirstTurn(game Game) {
-	if !game.HasNoLastDealtCombination() {
-		return
-	}
+	// check lại nếu có 1 người còn 1 con thì không được loại 2
 	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
 		if i == game.GetCurrentPlayerIndex() {
 			continue
@@ -332,7 +341,9 @@ func (l *LocalNode) remove2IfIsFirstTurn(game Game) {
 			return
 		}
 	}
+	// lấy quân bài lẻ gần nhỏ nhất (nhỏ thứ 2) mà không nằm trong bộ nào
 	card := l.getAlmostSmallestSingleCardWhichNotInAnyCombination()
+	// nếu không có bài nào hoặc lá đó cũng là 2
 	if isNil(card) || card.rank == Two {
 		return
 	}
@@ -434,7 +445,8 @@ func (l *LocalNode) removeUnexploredCombinationAt(index int) Combination {
 // có tứ quý, 3 đôi thông, 4 đôi thông
 func (l *LocalNode) hasStrongCombination(combinations []Combination) bool {
 	for i := range combinations {
-		if combinations[i].Kind() == CombinationQuads || combinations[i].Kind() == CombinationThreeConsecutivePairs ||
+		if combinations[i].Kind() == CombinationQuads ||
+			combinations[i].Kind() == CombinationThreeConsecutivePairs ||
 			combinations[i].Kind() == CombinationFourConsecutivePairs {
 			return true
 		}
@@ -480,4 +492,28 @@ func (l *LocalNode) allHasOneCardLeft(game Game) bool {
 		return false
 	}
 	return true
+}
+
+func (l *LocalNode) removeAllSingleCard() {
+	i := 0
+	for _, c := range l.unexploredCombinations {
+		if c.Kind() != CombinationSingle {
+			l.unexploredCombinations[i] = c
+			i++
+		}
+	}
+	l.unexploredCombinations = l.unexploredCombinations[:i]
+}
+
+func (l *LocalNode) String() string {
+	info := ""
+	for _, node := range l.children {
+		info += fmt.Sprintf("%-40s", "Node " + node.GetCombination().String())
+		info += "|"
+		info += fmt.Sprintf("%-20s", "Visit " + fmt.Sprintf("%d", node.GetVisit()))
+		info += "|"
+		info += fmt.Sprintf("%-30s", "Reward " + fmt.Sprintf("%+v", node.GetReward()))
+		info += "\n"
+	}
+	return info
 }
