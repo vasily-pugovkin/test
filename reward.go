@@ -3,13 +3,13 @@ package tienlen_bot
 const (
 	FactorPly               float64 = 0.005
 	NumberOfCardsAtLateGame int     = 6
-
-	FactorRed2sCard        float64 = 0.1
-	FactorBlack2sCard      float64 = 0.05
-	FactorNormalSingleCard float64 = 0.01
-	FactorThreePairs       float64 = 0.04
-	FactorFourPairs        float64 = 0.22
-	FactorQuads            float64 = 0.16
+	Multiplier              float64 = 1
+	FactorRed2sCard         float64 = 0.1 * Multiplier
+	FactorBlack2sCard       float64 = 0.05 * Multiplier
+	FactorNormalSingleCard  float64 = 0.01 * Multiplier
+	FactorThreePairs        float64 = 0.1 * Multiplier
+	FactorFourPairs         float64 = 0.3 * Multiplier
+	FactorQuads             float64 = 0.2 * Multiplier
 )
 
 type Reward interface {
