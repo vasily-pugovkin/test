@@ -132,12 +132,16 @@ func getSmallestPairsInPairsList(game Game) Combination {
 	return dubs[1]
 }
 
-// nếu bộ còn toàn cóc lẻ và bên kia không chặn được con cóc lẻ nào thì đánh lần lượt từ thấp lên cao
+
+// nếu bộ còn toàn cóc lẻ và bên kia không chặn được con cóc lẻ nào thì đánh lần lượt từ thấp gần nhất lên cao
+// chỉ tính nếu có ít nhất 1 người còn 2 lá trở lên
+// còn nếu tất cả mọi người đều còn 1 lá thì đánh từ cao xuống thất
 func getBestMoveForDefeatingSingleCard(game Game) Combination {
 	list := game.AllAvailableCombinations()
 	if !isAllSingleCard(list) {
 		return nil
 	}
+
 	if len(game.GetCurrentPlayer().AllAvailableCombinations()) != len(list) {
 		return nil
 	}
@@ -152,7 +156,16 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 			return nil
 		}
 	}
-	return list[1]
+	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
+		if i == game.GetCurrentPlayerIndex() {
+			continue
+		}
+		if game.GetPlayerAt(i).GetCardsLength() > 1 {
+			return list[1]
+		}
+
+	}
+	return list[len(list) - 1]
 }
 
 func isAllSingleCard(combinations []Combination) bool {

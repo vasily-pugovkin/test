@@ -389,6 +389,7 @@ func (l *LocalNode) removePass() {
 	}
 }
 
+// nếu mọi người toàn còn 1 quân thì đánh bộ trước, bỏ hết quân lẻ ra ngoài đánh bộ hết trước
 func (l *LocalNode) removeSingleCardIfTheyAllHaveOneCardLeft(game Game) {
 	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
 		if i == game.GetCurrentPlayerIndex() {
