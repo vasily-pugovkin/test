@@ -159,13 +159,15 @@ func (l *LocalGame) AllAvailableCombinations() []Combination {
 		list := player.AllAvailableCombinations()
 		if l.isFirstTurn {
 			card := player.GetSmallestCard()
-			availableCards := []Combination{}
-			for i := 0; i < len(list); i++ {
-				if containsCard(list[i].Cards(), card) {
-					availableCards = append(availableCards, list[i])
+			if card.rank == Three && card.suit == Spade {
+				availableCards := []Combination{}
+				for i := 0; i < len(list); i++ {
+					if containsCard(list[i].Cards(), card) {
+						availableCards = append(availableCards, list[i])
+					}
 				}
+				return availableCards
 			}
-			return availableCards
 		}
 		return list
 	} else {
