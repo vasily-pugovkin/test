@@ -37,6 +37,10 @@ func SelectBestCombination(game Game, config *MctsConfig) Combination {
 	if notNil(singleCard) {
 		return singleCard
 	}
+	singleCard = getBestMoveIfAllOtherPeopleHasOnlyOneCard(game)
+	if notNil(singleCard) {
+		return singleCard
+	}
 	pairs := getSmallestPairsInPairsList(game)
 	if notNil(pairs) {
 		return pairs
@@ -166,6 +170,38 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 
 	}
 	return list[len(list) - 1]
+}
+
+// nếu mọi người chỉ còn 1 lá và mình không còn bộ nào (chỉ còn quân lẻ)
+// thì đánh từ to tới nhỏ trong trường hợp là turn tự đánh ko phải turn chặt
+func getBestMoveIfAllOtherPeopleHasOnlyOneCard(game Game) Combination {
+	if game.GetCurrentPlayerIndex() != game.GetPreviousPlayerIndex() {
+		return nil
+	}
+	if !allOtherPeopleHasOnlySingleCardLeft(game) {
+		return nil
+	}
+
+	list := game.GetCurrentPlayer().AllAvailableCombinations()
+	return list[len(list) - 1]
+}
+
+
+// kiểm tra tất cả người khác có còn 1 lá ko
+// và mình chỉ còn toàn con lẻ không
+func allOtherPeopleHasOnlySingleCardLeft(game Game) bool {
+	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
+		if i == game.GetCurrentPlayerIndex() {
+			if !isAllSingleCard(game.GetPlayerAt(i).AllAvailableCombinations()) {
+				return false
+			}
+			continue
+		}
+		if game.GetPlayerAt(i).GetCardsLength() != 1 {
+			return false
+		}
+	}
+	return true
 }
 
 func isAllSingleCard(combinations []Combination) bool {
