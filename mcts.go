@@ -7,12 +7,12 @@ import (
 )
 
 type MctsConfig struct {
-	Interactions int
-	C float64
-	Debug bool
+	Interactions    int
+	C               float64
+	Debug           bool
 	MinThinkingTime int64
 	MaxThinkingTime int64
-	K float64
+	K               float64
 }
 
 func NewDefaultMctsConfig() *MctsConfig {
@@ -47,13 +47,16 @@ func SelectBestCombination(game Game, config *MctsConfig) Combination {
 	}
 	// monte carlo tree search algorithm
 	root := NewNode(nil, nil, -1, game)
+	if len(root.(*LocalNode).unexploredCombinations) == 1 {
+		return root.(*LocalNode).unexploredCombinations[0]
+	}
 	root.SetCFactor(config.C)
 	root.SetKFactor(config.K)
 	startThinkingTime := currentTimeMillis()
-	for interactions > 0 && currentTimeMillis() - startThinkingTime < config.MaxThinkingTime {
+	for interactions > 0 && currentTimeMillis()-startThinkingTime < config.MaxThinkingTime {
 		interactions--
 		/* keep playing while the ratio of winning is less than 50% */
-		if currentTimeMillis() - startThinkingTime > config.MinThinkingTime {
+		if currentTimeMillis()-startThinkingTime > config.MinThinkingTime {
 			var x, y float64
 			for i := 0; i < game.GetMaxPlayerNumber(); i++ {
 				if i == game.GetCurrentPlayerIndex() {
@@ -76,7 +79,7 @@ func SelectBestCombination(game Game, config *MctsConfig) Combination {
 
 	if config.Debug {
 		println(fmt.Sprintf("MCTS %d interactions, reward: %+v, visit: %d, thinking time: %d",
-			config.Interactions - interactions, root.GetReward(), root.GetVisit(), currentTimeMillis() - startThinkingTime))
+			config.Interactions-interactions, root.GetReward(), root.GetVisit(), currentTimeMillis()-startThinkingTime))
 		root.PrintAllChildren()
 	}
 
@@ -136,7 +139,6 @@ func getSmallestPairsInPairsList(game Game) Combination {
 	return dubs[1]
 }
 
-
 // nếu bộ còn toàn cóc lẻ và bên kia không chặn được con cóc lẻ nào thì đánh lần lượt từ thấp gần nhất lên cao
 // chỉ tính nếu có ít nhất 1 người còn 2 lá trở lên
 // còn nếu tất cả mọi người đều còn 1 lá thì đánh từ cao xuống thất
@@ -169,7 +171,7 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 		}
 
 	}
-	return list[len(list) - 1]
+	return list[len(list)-1]
 }
 
 // nếu mọi người chỉ còn 1 lá và mình không còn bộ nào (chỉ còn quân lẻ)
@@ -183,9 +185,8 @@ func getBestMoveIfAllOtherPeopleHasOnlyOneCard(game Game) Combination {
 	}
 
 	list := game.GetCurrentPlayer().AllAvailableCombinations()
-	return list[len(list) - 1]
+	return list[len(list)-1]
 }
-
 
 // kiểm tra tất cả người khác có còn 1 lá ko
 // và mình chỉ còn toàn con lẻ không
