@@ -59,6 +59,7 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 		} else {
 			node.unexploredCombinations = make([]Combination, len(list))
 			copy(node.unexploredCombinations, list)
+
 			if isNil(parent) && game.GetCurrentPlayerIndex() == game.GetPreviousPlayerIndex() && !game.GetConfig().IsFirstTurn {
 				node.removeStrongCombinationsIfNotNecessary(game)
 			} else if game.GetCurrentPlayerIndex() != game.GetPreviousPlayerIndex() {
@@ -80,6 +81,9 @@ func NewNode(parent *LocalNode, combination Combination, playerIndex int, game G
 						// và chỉ còn 1 con 2 với có ít nhất 1 con lẻ nhỏ hơn 2
 						// và không ai còn 1 lá trên bàn
 						node.remove2IfIsFirstTurn(game)
+						// xóa 3, 4 đôi thông hoặc tứ quý nếu người chơi kia còn 2 con 1 con 2 và 1 con lẻ
+						// con lẻ nhỏ hơn ít nhất 1 con lẻ của mình
+						node.removeCombinationStrongerThan2IfTheyHave2AndOneSmallSingleCardLeft(game)
 					}
 				}
 				if node.canDefeatTheirSingleCard(game) {
@@ -245,7 +249,7 @@ func (l *LocalNode) removeStrongCombinationsIfNotNecessary(game Game) {
 // ưu tiên đánh 2 trước khi ra tứ quý, 3 đôi thông hoặc 4 đôi thông
 func (l *LocalNode) removeStrongCombinationsThan2IfHave2() {
 	removedList1 := []Combination{}
-	removedList2 := []Combination{}
+	//removedList2 := []Combination{}
 	contains2sCard := false
 	for i := range l.unexploredCombinations {
 		o := l.unexploredCombinations[i]
@@ -260,16 +264,16 @@ func (l *LocalNode) removeStrongCombinationsThan2IfHave2() {
 			removedList1 = append(removedList1, o)
 		}
 
-		if containsRank(o.Cards(), Two) && o.Kind() != CombinationSingle {
-			removedList2 = append(removedList2, o)
-		}
+		//if containsRank(o.Cards(), Two) && o.Kind() != CombinationSingle {
+		//	removedList2 = append(removedList2, o)
+		//}
 	}
 
-	if len(removedList2) < len(l.unexploredCombinations)-1 {
-		for i := range removedList2 {
-			l.removeUnexploredCombination(removedList2[i])
-		}
-	}
+	//if len(removedList2) < len(l.unexploredCombinations)-1 {
+	//	for i := range removedList2 {
+	//		l.removeUnexploredCombination(removedList2[i])
+	//	}
+	//}
 
 	if !contains2sCard {
 		return
@@ -425,6 +429,81 @@ func (l *LocalNode) removeSingleCardIfTheyAllHaveOneCardLeft(game Game) {
 	if len(l.unexploredCombinations) == 0 {
 		l.unexploredCombinations = backup
 	}
+}
+
+// nếu đối phương còn 1 con 2 và 1 con lẻ (không phải 2)
+// bỏ các bộ mạnh hơn con 2 kia đi nếu bỏ đi mà vẫn có quân lẻ lớn hơn con lẻ còn lại của người kia
+// chỉ tính trường hợp 2 người chơi
+// trong turn không phải turn chặt
+func (l *LocalNode) removeCombinationStrongerThan2IfTheyHave2AndOneSmallSingleCardLeft(game Game) {
+	if game.GetMaxPlayerNumber() != 2 {
+		return
+	}
+	if game.GetPlayerAt(1 - game.GetCurrentPlayerIndex()).GetCardsLength() != 2 {
+		return
+	}
+	com := game.GetPlayerAt(1 - game.GetCurrentPlayerIndex()).AllAvailableCombinations()
+	if len(com) != 2 {
+		return
+	}
+	if com[0].Kind() != CombinationSingle || com[1].Kind() != CombinationSingle {
+		return
+	}
+	if com[0].(*SingleCard).card.rank != Two && com[1].(*SingleCard).card.rank != Two {
+		return
+	}
+	if com[0].(*SingleCard).card.rank == Two && com[1].(*SingleCard).card.rank == Two {
+		return
+	}
+	var card *SingleCard
+	if com[0].(*SingleCard).card.rank == Two {
+		card = com[1].(*SingleCard)
+	} else {
+		card = com[0].(*SingleCard)
+	}
+
+	rmList := []Combination{}
+	for i := range l.unexploredCombinations {
+		if l.unexploredCombinations[i].Kind() == CombinationThreeConsecutivePairs ||
+			l.unexploredCombinations[i].Kind() == CombinationFourConsecutivePairs ||
+			l.unexploredCombinations[i].Kind() == CombinationQuads {
+			rmList = append(rmList, l.unexploredCombinations[i])
+		}
+	}
+	rmListLen := len(rmList)
+	for i := 0; i < rmListLen; i++ {
+		rmList = append(rmList, game.GetCurrentPlayer().GetAllCombinationsHasSameAtLeastOneCardWith(rmList[i])...)
+	}
+
+	backup := make([]Combination, len(l.unexploredCombinations))
+	copy(backup, l.unexploredCombinations)
+
+	for i := range rmList {
+		l.removeUnexploredCombination(rmList[i])
+	}
+
+	if len(l.unexploredCombinations) > 0 {
+		for i := range l.unexploredCombinations {
+			if l.unexploredCombinations[i].Defeats(card) {
+				if card.card.rank != Ace {
+					// nếu quân lẻ kia kp quân át thì bỏ các bộ đôi A, tam A ra, đánh cóc A câu 2
+					rmList = []Combination{}
+					for j := range l.unexploredCombinations {
+						if (l.unexploredCombinations[j].Kind() == CombinationDubs ||
+							l.unexploredCombinations[j].Kind() == CombinationTrips) &&
+							containsRank(l.unexploredCombinations[j].Cards(), Ace) {
+							rmList = append(rmList, l.unexploredCombinations[j])
+						}
+					}
+					for _, c := range rmList {
+						l.removeUnexploredCombination(c)
+					}
+				}
+				return
+			}
+		}
+	}
+	l.unexploredCombinations = backup
 }
 
 // xóa bộ khỏi list
