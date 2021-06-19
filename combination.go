@@ -190,7 +190,7 @@ func GetSequence(cards []*Card) []*Sequence {
 			checkList[cards[i].rank] = append(list, cards[i])
 		}
 	}
-	for i := Three; i < Queen; i++ {
+	for i := Three; i <= Queen; i++ {
 		list := checkList[i]
 		if list == nil {
 			continue
@@ -206,7 +206,7 @@ func GetSequence(cards []*Card) []*Sequence {
 				}
 			}
 		}
-		for j := i + 2; j < Ace; j++ {
+		for j := i + 2; j <= Ace; j++ {
 			l := checkList[j]
 			if l == nil {
 				break
