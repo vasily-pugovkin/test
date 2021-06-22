@@ -5,26 +5,26 @@ import (
 )
 
 type GameConfiguration struct {
-	Passed               []bool
-	MaxPlayer            int
-	PreviousPlayerIndex  int
-	CurrentPlayerIndex   int
-	LastDealtCombination Combination
-	Rape                 bool
-	IsFirstTurn          bool
-	UseHeuristic         bool
+	Passed                    []bool
+	MaxPlayer                 int
+	PreviousPlayerIndex       int
+	CurrentPlayerIndex        int
+	LastDealtCombination      Combination
+	Rape                      bool
+	IsFirstTurn               bool
+	UseHeuristic              bool
 }
 
 func NewDefaultGameConfig(maxPlayers int) *GameConfiguration {
 	return &GameConfiguration{
-		Passed:               make([]bool, maxPlayers),
-		MaxPlayer:            maxPlayers,
-		PreviousPlayerIndex:  0,
-		CurrentPlayerIndex:   0,
-		LastDealtCombination: nil,
-		Rape:                 false,
-		IsFirstTurn:          true,
-		UseHeuristic:         true,
+		Passed:                    make([]bool, maxPlayers),
+		MaxPlayer:                 maxPlayers,
+		PreviousPlayerIndex:       0,
+		CurrentPlayerIndex:        0,
+		LastDealtCombination:      nil,
+		Rape:                      false,
+		IsFirstTurn:               true,
+		UseHeuristic:              true,
 	}
 }
 
@@ -184,10 +184,10 @@ func (l *LocalGame) PlayRandomUntilEnd() {
 		if l.IsEnd() {
 			break
 		}
-		list := l.AllAvailableCombinations();
+		list := l.AllAvailableCombinations()
 		if len(list) > 0 &&
 			len(list[len(list)-1].Cards()) == l.GetCurrentPlayer().GetCardsLength() {
-			l.Move(list[len(list) - 1])
+			l.Move(list[len(list)-1])
 			break
 		}
 		if len(list) == 0 || l.currentPlayerIndex != l.previousPlayerIndex {
@@ -216,12 +216,14 @@ func (l *LocalGame) PlayRandomUntilEnd() {
 		if l.config.UseHeuristic {
 			winner := l.GetWinnerIndex()
 			total := - float64(l.ply) * FactorPly
-			for i := 0; i < l.maxNumberOfPlayers; i++ {
-				total += l.players[i].GetScore()
-			}
+			// DEBUG
+			//for i := 0; i < l.maxNumberOfPlayers; i++ {
+			//	total += l.players[i].GetScore()
+			//}
+
 			for i := 0; i < l.maxNumberOfPlayers; i++ {
 				if i == winner {
-					l.reward.SetScore(i, 1 + total)
+					l.reward.SetScore(i, 1+total)
 				} else {
 					l.reward.SetScore(i, - l.GetPlayerAt(i).GetScore())
 				}
@@ -303,7 +305,7 @@ func (l *LocalGame) HasNoLastDealtCombination() bool {
 }
 
 func (l *LocalGame) increaseIndex() {
-	if l.currentPlayerIndex == l.maxNumberOfPlayers - 1 {
+	if l.currentPlayerIndex == l.maxNumberOfPlayers-1 {
 		l.currentPlayerIndex = 0
 	} else {
 		l.currentPlayerIndex++
