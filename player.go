@@ -5,20 +5,43 @@ import (
 )
 
 type Player interface {
+	// lấy bộ bài gốc được set cho player lúc đầu
 	GetOriginalCards() []*Card
+	// lấy toàn bộ các quân bài, bộ bài có thể đánh
 	AllAvailableCombinations() []Combination
+	// lấy toàn bộ bộ bài có thể đánh để chặt được bộ combination
 	AllAvailableCombinationsDefeat(combination Combination) []Combination
+	// xóa bộ combination ra khỏi bộ bài
 	Remove(combination Combination)
+	// set init card cho người chơi
+	// có thể get ra bằng hàm GetOriginalCards
 	SetCards(cards []*Card)
+	// giống SetCards nhưng trả về Player
 	WithCards(cards []*Card) Player
+	// set vị trí của người chơi trong bàn
+	// thứ tự lần lượt của người chơi sẽ tăng dần theo
+	// vòng chơi ví dụ: có 4 người chơi với index lần lượt là 0, 1, 2, 3
+	// hiện tại người đang có lượt là người 2, thì người tiếp theo là người 3
+	// hiện tại người đang có lượt là người 3 thì người tiếp theo là người 1
 	SetIndex(index int)
+	// hàm này sẽ được call 1 lần khi được add vào Game
+	// không được call hàm này bên ngoài tránh dẫn đến lỗi
 	Validate()
+	// trả về một bản copy của Player
+	// thay đổi các trạng thái của Player mới sẽ không ảnh hưởng tới Player này
 	Copy() Player
+	// trả về true nếu người chơi là Bot
 	IsBot() bool
+	// set bot cho người chơi
 	SetBot(bot bool)
+	// lấy số lượng bài còn lại của người chơi
 	GetCardsLength() int
+	// lấy lá có giá trị nhỏ nhất trong bộ bài
 	GetSmallestCard() *Card
+	// lấy điểm hiện tại của người chơi
+	// điểm càng cao thì người chơi còn càng nhiều bài, nhiều đồ
 	GetScore() float64
+	// lấy tất cả bộ có chung ít nhất 1 lá với bộ combination
 	GetAllCombinationsHasSameAtLeastOneCardWith(combination Combination) []Combination
 }
 

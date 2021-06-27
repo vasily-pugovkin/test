@@ -154,6 +154,7 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 	if len(list) == 1 {
 		return list[0]
 	}
+	// kiểm tra điều kiện có ai chặt được quân nhỏ gần nhất không
 	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
 		if i == game.GetCurrentPlayerIndex() || game.PlayerPassed(i) {
 			continue
@@ -162,15 +163,23 @@ func getBestMoveForDefeatingSingleCard(game Game) Combination {
 			return nil
 		}
 	}
+	// check trường hợp có ít nhất 1 thằng trên bàn còn nhiều hơn 1 lá thì đánh từ lá nhỏ gần nhất nếu còn nhiều
+	// hơn 2 lá
+	// hoặc đánh là nhỏ nhất nếu còn 2 lá
 	for i := 0; i < game.GetMaxPlayerNumber(); i++ {
 		if i == game.GetCurrentPlayerIndex() {
 			continue
 		}
 		if game.GetPlayerAt(i).GetCardsLength() > 1 {
+			// nếu ít hơn 3 lá thì đánh là nhỏ nhất
+			if game.GetPlayerAt(game.GetCurrentPlayerIndex()).GetCardsLength() <= 2 {
+				return list[0]
+			}
+			// nếu nhiều hơn 2 lá thì đánh là gần nhỏ nhất
 			return list[1]
 		}
-
 	}
+	// nếu mọi người chỉ còn 1 lá thì đánh là to nhất trở xuống
 	return list[len(list)-1]
 }
 
@@ -203,6 +212,12 @@ func allOtherPeopleHasOnlySingleCardLeft(game Game) bool {
 		}
 	}
 	return true
+}
+
+// đánh quân nhỏ nhất, nều bài mình chắc thắng và toàn quân lẻ
+// nếu đối phương không còn quân
+func keepSmallestCardIfSureWinAndHaveNoCombination() {
+
 }
 
 func isAllSingleCard(combinations []Combination) bool {
