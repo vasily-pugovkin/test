@@ -216,10 +216,9 @@ func (l *LocalGame) PlayRandomUntilEnd() {
 		if l.config.UseHeuristic {
 			winner := l.GetWinnerIndex()
 			total := - float64(l.ply) * FactorPly
-			// DEBUG
-			//for i := 0; i < l.maxNumberOfPlayers; i++ {
-			//	total += l.players[i].GetScore()
-			//}
+			for i := 0; i < l.maxNumberOfPlayers; i++ {
+				total += l.players[i].GetScore()
+			}
 
 			for i := 0; i < l.maxNumberOfPlayers; i++ {
 				if i == winner {
