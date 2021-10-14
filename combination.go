@@ -116,8 +116,9 @@ func ParseCombination(cards []*Card, kind CombinationKind) (Combination, error) 
 	}
 }
 
+// GetDubs get all dubs in card list
 func GetDubs(cards []*Card) []*Dubs {
-	dubs := []*Dubs{}
+	var dubs []*Dubs
 	for i := 0; i < len(cards); i++ {
 		for j := i + 1; j < len(cards); j++ {
 			if isDubs(cards[i], cards[j]) {
@@ -131,6 +132,7 @@ func GetDubs(cards []*Card) []*Dubs {
 	return dubs
 }
 
+// GetTrips get all trips in card list
 func GetTrips(cards []*Card) []*Trips {
 	trips := []*Trips{}
 	count := make([]int, 13)
@@ -161,6 +163,7 @@ func GetTrips(cards []*Card) []*Trips {
 	return trips
 }
 
+// GetQuads get all quads in card list
 func GetQuads(cards []*Card) []*Quads {
 	quads := []*Quads{}
 	count := make([]int, 13)
@@ -179,6 +182,7 @@ func GetQuads(cards []*Card) []*Quads {
 	return quads
 }
 
+// GetSequence get all sequence in card list
 func GetSequence(cards []*Card) []*Sequence {
 	sequences := []*Sequence{}
 	checkList := make([][]*Card, 13)
@@ -228,8 +232,9 @@ func GetSequence(cards []*Card) []*Sequence {
 	return sequences
 }
 
+// GetTwoConsecutivePairs get all two consecutive pairs in card list
 func GetTwoConsecutivePairs(cards []*Card) []*TwoConsecutivePairs {
-	pairs := []*TwoConsecutivePairs{}
+	var pairs []*TwoConsecutivePairs
 	dubs := GetDubs(cards)
 	if len(dubs) < 2 {
 		return pairs
@@ -248,7 +253,7 @@ func GetTwoConsecutivePairs(cards []*Card) []*TwoConsecutivePairs {
 }
 
 func GetThreeConsecutivePairs(cards []*Card) []*ThreeConsecutivePairs {
-	pairs := []*ThreeConsecutivePairs{}
+	var pairs []*ThreeConsecutivePairs
 	dubs := GetDubs(cards)
 	if len(dubs) < 3 {
 		return pairs
@@ -269,7 +274,7 @@ func GetThreeConsecutivePairs(cards []*Card) []*ThreeConsecutivePairs {
 }
 
 func GetFourConsecutivePairs(cards []*Card) []*FourConsecutivePairs {
-	pairs := []*FourConsecutivePairs{}
+	var pairs []*FourConsecutivePairs
 	dubs := GetDubs(cards)
 	if len(dubs) < 4 {
 		return pairs
@@ -292,27 +297,11 @@ func GetFourConsecutivePairs(cards []*Card) []*FourConsecutivePairs {
 }
 
 func getAllCardsWithRank(cards []*Card, rank Rank) []*Card {
-	list := []*Card{}
+	var list []*Card
 	for i := 0; i < len(cards); i++ {
 		if cards[i].rank == rank {
 			list = append(list, cards[i])
 		}
 	}
 	return list
-}
-
-func countCardInCombinationList(combinations []Combination) int {
-	count := 0
-	checker := make([]bool, 52)
-	for _, combination := range combinations {
-		cards := combination.Cards()
-		for _, card := range cards {
-			code := int(card.rank) * 4 + int(card.suit)
-			if !checker[code] {
-				checker[code] = true
-				count++
-			}
-		}
-	}
-	return count
 }

@@ -1,7 +1,6 @@
 package tienlen_bot
 
 import (
-	"github.com/fatih/color"
 	"math/rand"
 	"sort"
 	"strings"
@@ -107,21 +106,15 @@ func (c *Card) String() string {
 	default:
 		s += "undefined"
 	}
-	blackBold := color.New(color.FgBlack, color.Bold)
-	redBold := color.New(color.FgRed, color.Bold)
 	switch c.suit {
 	case Spade:
 		s += "♠"
-		s = blackBold.Sprintf(s)
 	case Club:
 		s += "♣"
-		s = blackBold.Sprintf(s)
 	case Diamond:
 		s += "♦"
-		s = redBold.Sprintf(s)
 	case Heart:
 		s += "♥"
-		s = redBold.Sprintf(s)
 	default:
 		s += "💀"
 	}
